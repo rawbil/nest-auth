@@ -16,7 +16,7 @@ datasource db {
 
 
 //user model
-model User {
+model Users {
   id String @id @default(cuid())
   username String
   email String @unique
