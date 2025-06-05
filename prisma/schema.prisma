@@ -14,6 +14,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//enum for user role
+enum user_role {
+  user
+  client
+  customer
+}
+
 
 //user model
 model Users {
@@ -24,4 +31,5 @@ model Users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   refreshToken String?
+  role user_role @default(user)
 }

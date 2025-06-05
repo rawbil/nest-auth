@@ -104,4 +104,9 @@ export class AuthService {
         refresh_token,
     }
   }
+
+  //!Logout
+  async logout() {
+    
+  }
 }

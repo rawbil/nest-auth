@@ -16,4 +16,9 @@ export class AuthController {
     login(@Body(ValidationPipe) loginDto: LoginDto) {
         return this.authService.login(loginDto);
     }
+
+    @Post('logout') //POST /auth/logout
+    logout() {{
+        return this.authService.logout()
+    }}
 }
