@@ -4,4 +4,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class AuthService {
     constructor(private readonly prisma: PrismaService) {}
+
+    //!REGISTER
+    async register() {}
+
+    //!LOGIN
+    async login() {}
+
 }
