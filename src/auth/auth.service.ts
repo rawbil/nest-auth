@@ -87,7 +87,7 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    //hash refresh token
+    //hash refresh token --- failure to which you get an error stating token is too long for the column
     const hashedRefreshToken = await hashPassword(refresh_token);
 
     //save the refresh token to the database
