@@ -141,6 +141,10 @@ export class AuthService {
 
     //^__TO DO__
     //^If new refresh token is created, invalidate the old one
+    await this.prisma.users.update({
+      where: { id: user.id },
+      data: { refreshToken: null }
+    }); //!Not Working--fix later
 
     //generate a new access and refresh token
     return this.signTokens(user.id, user.email);
