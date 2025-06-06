@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -9,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import { comparePassword, hashPassword } from './utils/passwords';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -105,8 +107,43 @@ export class AuthService {
     }
   }
 
-  //!Logout
-  async logout() {
+  //!generate new access_token from refresh_tokenn
+  async refreshAccessToken(refreshTokenDto: RefreshTokenDto) {
+    const {refresh_token} = refreshTokenDto;
+
+    if(!refresh_token) {
+      throw new UnauthorizedException("Refresh Token not provided.")
+    }
+
+    //get jwt_secret from config
+    const jwt_secret = this.config.get("JWT_SECRET");
+    if(!jwt_secret) {
+      throw new UnauthorizedException("oops...JWT secret not provided :(")
+    }
+
+    //decode payload from token
+    const decoded = await this.jwtService.verifyAsync(refresh_token, jwt_secret);
+    if(!decoded) {
+      throw new UnauthorizedException("oops... authorization failed. Try again");
+    }
     
+    //find decoded user
+    const user = await this.prisma.users.findUnique({where: {id: decoded.userId}});
+    if(!user) {
+      throw new UnauthorizedException("Authorized user not found")
+    }
+
+    //verify refresh token against the one stored in DB
+    const verifyRefreshToken = await comparePassword(refresh_token, user.refreshToken as string);
+    if(!verifyRefreshToken) {
+      throw new UnauthorizedException("Refresh token is invalid");
+    }
+
+    //^__TO DO__
+    //^If new refresh token is created, invalidate the old one
+
+    //generate a new access and refresh token
+    return this.signTokens(user.id, user.email);
+
   }
 }
