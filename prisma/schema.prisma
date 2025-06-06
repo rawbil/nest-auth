@@ -17,8 +17,7 @@ datasource db {
 //enum for user role
 enum UserRole {
   USER
-  CLIENT
-  CUSTOMER
+  ADMIN
 }
 
 
