@@ -1,7 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { hashPassword } from 'src/auth/utils/passwords';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,37 +34,64 @@ export class UsersService {
     });
 
     return {
-        success: true,
-        message: `User ${data.email} created successfully!`,
-        newUser
-    }
+      success: true,
+      message: `User ${data.email} created successfully!`,
+      newUser,
+    };
   }
 
   //!Get all users
   async getAllUsers() {
     const users = await this.prisma.users.findMany();
     return {
-        success: true,
-        message: "Users fetched successfully",
-        users,
-    }
+      success: true,
+      message: 'Users fetched successfully',
+      users,
+    };
   }
 
   //!Get user with id
   async getSingleUser(id: string) {
-    const user = await this.prisma.users.findUnique({where: {id}});
-    if(!user) {
-        throw new NotFoundException(`User: ${id} not found`);
+    const user = await this.prisma.users.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User: "${id}" not found`);
     }
 
     return {
-        success: true,
-        message: `User ${user.email} fetched successfully`,
-        user,
-    }
+      success: true,
+      message: `User '${user.email}' fetched successfully`,
+      user,
+    };
   }
 
   //!Update user with id
+  async updateUser(id: string, data: Prisma.UsersUpdateInput) {
+    //check if user with given id exists
+    const user = await this.prisma.users.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User '${id}' not found`);
+    }
+
+    //check for email
+    if (data.email) {
+      const emailExists = await this.prisma.users.findUnique({
+        where: { email: data.email as string },
+      });
+      if (emailExists) {
+        throw new ConflictException(
+          `Email '${data.email}' already in use :( )`,
+        );
+      }
+    }
+    
+    const updatedUser = await this.prisma.users.update({ where: { id }, data });
+
+    return {
+      success: true,
+      message: 'User updated successfully',
+      updatedUser,
+    };
+  }
 
   //!Delete user
 }
