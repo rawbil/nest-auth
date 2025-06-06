@@ -83,7 +83,7 @@ export class UsersService {
         );
       }
     }
-    
+
     const updatedUser = await this.prisma.users.update({ where: { id }, data });
 
     return {
@@ -94,4 +94,17 @@ export class UsersService {
   }
 
   //!Delete user
+  async deleteUser(id: string) {
+    const user = await this.prisma.users.findUnique({where: {id}});
+    if(!user) {
+        throw new NotFoundException("User to delete not found");
+    }
+
+    const deletedUser = await this.prisma.users.delete({where: {id}});
+    return {
+        success: true,
+        message: "User deleted successfully",
+        deletedUser
+    }
+  }
 }
