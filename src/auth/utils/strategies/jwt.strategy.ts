@@ -6,7 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') { //attatch it to auth module
   constructor(
     config: ConfigService,
     private readonly prisma: PrismaService,
@@ -29,6 +29,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
     if (!user)
       throw new UnauthorizedException('oops... failed to validate user');
-    return user;
+    return user; //attatches req.user to payload
   }
 }
