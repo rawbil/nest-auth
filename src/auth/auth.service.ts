@@ -150,4 +150,9 @@ export class AuthService {
     return this.signTokens(user.id, user.email);
 
   }
+
+  //!LOGOUT
+  async logout() {
+    //delete refresh token from database
+  }
 }
