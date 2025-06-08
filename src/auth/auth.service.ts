@@ -95,64 +95,83 @@ export class AuthService {
     //save the refresh token to the database
     await this.prisma.users.update({
       where: { id: userId },
-      data: { refreshToken: hashedRefreshToken},
+      data: { refreshToken: hashedRefreshToken },
     });
 
     //return statement
     return {
-        success: true,
-        message: "Login successful :)",
-        access_token,
-        refresh_token,
-    }
+      success: true,
+      message: 'Login successful :)',
+      access_token,
+      refresh_token,
+    };
   }
 
   //!generate new access_token from refresh_tokenn
   async refreshAccessToken(refreshTokenDto: RefreshTokenDto) {
-    const {refresh_token} = refreshTokenDto;
+    const { refresh_token } = refreshTokenDto;
 
-    if(!refresh_token) {
-      throw new UnauthorizedException("Refresh Token not provided.")
+    if (!refresh_token) {
+      throw new UnauthorizedException('Refresh Token not provided.');
     }
 
     //get jwt_secret from config
-    const jwt_secret = this.config.get("JWT_SECRET");
-    if(!jwt_secret) {
-      throw new UnauthorizedException("oops...JWT secret not provided :(")
+    const jwt_secret = this.config.get('JWT_SECRET');
+    if (!jwt_secret) {
+      throw new UnauthorizedException('oops...JWT secret not provided :(');
     }
 
     //decode payload from token
-    const decoded = await this.jwtService.verifyAsync(refresh_token, jwt_secret);
-    if(!decoded) {
-      throw new UnauthorizedException("oops... authorization failed. Try again");
+    const decoded = await this.jwtService.verifyAsync(
+      refresh_token,
+      jwt_secret,
+    );
+    if (!decoded) {
+      throw new UnauthorizedException(
+        'oops... authorization failed. Try again',
+      );
     }
-    
+
     //find decoded user
-    const user = await this.prisma.users.findUnique({where: {id: decoded.userId}});
-    if(!user) {
-      throw new UnauthorizedException("Authorized user not found")
+    const user = await this.prisma.users.findUnique({
+      where: { id: decoded.userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException('Authorized user not found');
     }
 
     //verify refresh token against the one stored in DB
-    const verifyRefreshToken = await comparePassword(refresh_token, user.refreshToken as string);
-    if(!verifyRefreshToken) {
-      throw new UnauthorizedException("Refresh token is invalid");
+    const verifyRefreshToken = await comparePassword(
+      refresh_token,
+      user.refreshToken as string,
+    );
+    if (!verifyRefreshToken) {
+      throw new UnauthorizedException('Refresh token is invalid');
     }
 
     //^__TO DO__
     //^If new refresh token is created, invalidate the old one
     await this.prisma.users.update({
       where: { id: user.id },
-      data: { refreshToken: null }
+      data: { refreshToken: null },
     }); //!Not Working--fix later
 
     //generate a new access and refresh token
     return this.signTokens(user.id, user.email);
-
   }
 
   //!LOGOUT
-  async logout() {
+
+  async logout(userId: string) {
     //delete refresh token from database
+     await this.prisma.users.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+
+    return {
+      success: true,
+      message: "Logged out successfully"
+    }
   }
 }
