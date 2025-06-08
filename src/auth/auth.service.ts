@@ -136,7 +136,7 @@ export class AuthService {
     const user = await this.prisma.users.findUnique({
       where: { id: decoded.userId },
     });
-    if (!user) {
+    if (!user || !user.refreshToken) {
       throw new UnauthorizedException('Authorized user not found');
     }
 
