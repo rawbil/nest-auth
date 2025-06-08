@@ -13,6 +13,8 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { Request } from 'express';
 import { GetUser } from './decorators/get-user.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -40,5 +42,16 @@ export class AuthController {
   @Post('logout') //POST /auth/logout
   logout(@GetUser('id') userId: string) {
     return this.authService.logout(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password') //POST /auth/change-password
+  changePassword(@Body() changePasswordDto: ChangePasswordDto, @GetUser('id') id: string) {
+    return this.authService.changePassword(id, changePasswordDto);
+  }
+
+  @Post('reset-password') //POST /auth/reset-password
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
