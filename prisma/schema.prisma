@@ -31,4 +31,5 @@ model Users {
   updatedAt DateTime @updatedAt
   refreshToken String?
   role UserRole @default(USER)
+  avatar String?
 }
