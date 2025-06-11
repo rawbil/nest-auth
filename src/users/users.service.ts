@@ -107,4 +107,15 @@ export class UsersService {
         deletedUser
     }
   }
+
+
+  //!add avatar
+  async addAvatar() {
+
+  }
+
+  //!update avatar
+  async updateAvatar() {
+    
+  }
 }
