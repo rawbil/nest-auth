@@ -110,12 +110,17 @@ export class UsersService {
 
 
   //!add avatar
-  async addAvatar() {
+  async addAvatar(data: string) {
 
   }
 
   //!update avatar
   async updateAvatar() {
     
+  }
+
+  //!remove avatar
+  async removeAvatar() {
+
   }
 }
