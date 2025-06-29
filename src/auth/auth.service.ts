@@ -237,6 +237,8 @@ export class AuthService {
     //update user
     const updatedUser = await this.prisma.users.update({where: {email}, data: {password: hashedNewPassword}});
 
+    //send the new password to the user's email, where they can retrieve it and log in again
+
     return {
       success: true,
       message: "Password reset successfull!"

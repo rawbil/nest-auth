@@ -50,6 +50,7 @@ export class AuthController {
     return this.authService.changePassword(id, changePasswordDto);
   }
 
+  //You don't need to be logged in to reset password
   @Post('reset-password') //POST /auth/reset-password
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto/*, @GetUser('id') id: string*/) {
     return this.authService.resetPassword(/*id,*/ resetPasswordDto);
